@@ -14,7 +14,14 @@
 
 (setq package-list
       '(gruvbox-theme
-	evil))
+	evil
+	evil-leader
+	helm
+	helm-descbinds
+	helm-projectile
+	magit
+	
+	))
 
 
 ; activate all the packages

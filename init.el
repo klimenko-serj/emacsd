@@ -9,6 +9,8 @@
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 
+(recentf-mode 1)
+(setq-default recent-save-file "~/.emacs.d/recentf")
 
 (load "~/.emacs.d/init-packages")
 
@@ -16,6 +18,35 @@
 
 (require 'evil)
 (evil-mode 1)
+
+(require 'helm)
+
+(require 'helm-projectile)
+(helm-projectile-on)
+
+(require 'evil-leader)
+(global-evil-leader-mode)
+
+	 
+;; keybindings
+
+(global-set-key (kbd "M-x") 'helm-M-x)
+
+(evil-leader/set-leader "<SPC>")
+(evil-leader/set-key
+  "<SPC>" 'helm-M-x
+  "b" 'helm-mini
+  "f" 'helm-find-files
+  "y" 'helm-show-kill-ring
+  "r" 'helm-recentf
+  "p" 'helm-projectile
+  "P" 'helm-projectile-switch-project
+  "j" 'helm-semantic-or-imenu
+  "gs" 'magit-status
+  )
+
+(require 'helm-descbinds)
+(helm-descbinds-mode)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
