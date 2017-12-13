@@ -50,6 +50,8 @@
 (require 'powerline)
 (powerline-evil-vim-color-theme)
 (display-time-mode t)
+
+
 ;; keybindings
 
 (global-set-key (kbd "M-x") 'helm-M-x)
