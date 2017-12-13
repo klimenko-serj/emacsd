@@ -1,3 +1,10 @@
+(when window-system
+  (progn
+    ;(set-frame-size (selected-frame) 160 58)
+    (setq initial-frame-alist '((width . 160) (height . 58)))
+    (setq default-frame-alist '((width . 160) (height . 58)))
+    ))
+
 
 ;; Added by Package.el.  This must come before configurations of
 ;; installed packages.  Don't delete this line.  If you don't want it,
@@ -27,6 +34,7 @@
 (require 'evil-leader)
 (global-evil-leader-mode)
 
+(require 'evil-magit)
 	 
 ;; keybindings
 
@@ -43,6 +51,8 @@
   "P" 'helm-projectile-switch-project
   "j" 'helm-semantic-or-imenu
   "gs" 'magit-status
+  "wo" 'delete-other-windows
+  "wd" 'delete-window
   )
 
 (require 'helm-descbinds)

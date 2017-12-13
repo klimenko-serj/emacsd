@@ -20,6 +20,7 @@
 	helm-descbinds
 	helm-projectile
 	magit
+	evil-magit
 	
 	))
 
