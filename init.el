@@ -15,6 +15,7 @@
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
+(setq make-backup-files nil)
 
 (recentf-mode 1)
 (setq-default recent-save-file "~/.emacs.d/recentf")
@@ -25,6 +26,13 @@
 
 (require 'evil)
 (evil-mode 1)
+(setq evil-emacs-state-cursor '("red" box))
+(setq evil-normal-state-cursor '("orange" box))
+(setq evil-visual-state-cursor '("brown" box))
+(setq evil-insert-state-cursor '("red" bar))
+(setq evil-replace-state-cursor '("red" bar))
+(setq evil-operator-state-cursor '("red" hollow))
+(setq evil-move-cursor-back nil)
 
 (require 'helm)
 
@@ -35,7 +43,13 @@
 (global-evil-leader-mode)
 
 (require 'evil-magit)
-	 
+
+(ac-config-default)
+(global-auto-complete-mode t)
+
+(require 'powerline)
+(powerline-evil-vim-color-theme)
+(display-time-mode t)
 ;; keybindings
 
 (global-set-key (kbd "M-x") 'helm-M-x)
@@ -53,6 +67,7 @@
   "gs" 'magit-status
   "wo" 'delete-other-windows
   "wd" 'delete-window
+  "qq" 'save-buffers-kill-emacs
   )
 
 (require 'helm-descbinds)

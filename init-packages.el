@@ -6,6 +6,11 @@
 (add-to-list 'package-archives
              '("marmalade" . "http://marmalade-repo.org/packages/"))
 
+(let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
+                    (not (gnutls-available-p))))
+       (url (concat (if no-ssl "http" "https") "://melpa.org/packages/")))
+  (add-to-list 'package-archives (cons "melpa" url) t))
+
 (add-to-list 'package-archives
              '("melpa-stable" . "http://melpa-stable.milkbox.net/packages/") t)
 
@@ -14,14 +19,25 @@
 
 (setq package-list
       '(gruvbox-theme
+
 	evil
 	evil-leader
+
 	helm
 	helm-descbinds
 	helm-projectile
+
 	magit
 	evil-magit
-	
+
+	auto-complete
+
+	;; powerline
+	powerline-evil
+
+	clojure-mode
+	cider
+
 	))
 
 
