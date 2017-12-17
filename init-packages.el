@@ -19,9 +19,12 @@
 
 (setq package-list
       '(gruvbox-theme
+	dashboard
 
 	evil
 	evil-leader
+
+	projectile
 
 	helm
 	helm-descbinds
@@ -30,12 +33,16 @@
 	magit
 	evil-magit
 
-	auto-complete
+	company
 
-	;; powerline
 	powerline-evil
 
+	neotree
+
+	fill-column-indicator
+
 	clojure-mode
+	clj-refactor
 	cider
 
 	))
