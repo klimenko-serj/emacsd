@@ -27,8 +27,9 @@
 	projectile
 
 	helm
-	helm-descbinds
 	helm-projectile
+
+	which-key
 
 	magit
 	evil-magit

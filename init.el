@@ -129,8 +129,8 @@
 	    (define-key evil-normal-state-local-map (kbd "o") 'neotree-enter)))
 
 
-(require 'helm-descbinds)
-(helm-descbinds-mode)
+(require 'which-key)
+(which-key-mode)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
