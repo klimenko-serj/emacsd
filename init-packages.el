@@ -36,18 +36,18 @@
 
 	company
 
-	powerline-evil
+	telephone-line
 
 	neotree
 
 	fill-column-indicator
 
+	evil-cleverparens
 	clojure-mode
 	clj-refactor
 	cider
 
 	))
-
 
 ; activate all the packages
 (package-initialize)

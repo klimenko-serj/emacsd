@@ -1,10 +1,12 @@
 (when window-system
   (progn
-    ;(set-frame-size (selected-frame) 160 58)
     (setq initial-frame-alist '((width . 160) (height . 58)))
     (setq default-frame-alist '((width . 160) (height . 58)))
+    (tool-bar-mode -1)
+    (scroll-bar-mode -1)
     ))
 
+(menu-bar-mode -1)
 
 ;; Added by Package.el.  This must come before configurations of
 ;; installed packages.  Don't delete this line.  If you don't want it,
@@ -12,9 +14,6 @@
 ;; You may delete these explanatory comments.
 (package-initialize)
 
-(menu-bar-mode -1)
-(tool-bar-mode -1)
-(scroll-bar-mode -1)
 (setq make-backup-files nil)
 
 (recentf-mode 1)
@@ -55,9 +54,8 @@
 (define-key company-active-map (kbd "C-k") 'company-select-previous)
 
 
-(require 'powerline)
-(powerline-evil-vim-color-theme)
-(display-time-mode t)
+(require 'telephone-line-config)
+(telephone-line-evil-config)
 
 (require 'dashboard)
 (dashboard-setup-startup-hook)
@@ -128,6 +126,13 @@
 
 	    (define-key evil-normal-state-local-map (kbd "o") 'neotree-enter)))
 
+
+(defun lisp-editing-keybindings ()
+  (evil-cleverparens-mode))
+
+(add-hook 'lisp-mode-hook #'lisp-editing-keybindings)
+(add-hook 'clojure-mode-hook #'lisp-editing-keybindings)
+(add-hook 'emacs-lisp-mode-hook #'lisp-editing-keybindings)
 
 (require 'which-key)
 (which-key-mode)
