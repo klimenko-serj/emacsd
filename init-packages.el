@@ -23,6 +23,9 @@
 
 	evil
 	evil-leader
+	evil-visualstar
+
+	avy
 
 	projectile
 
@@ -40,9 +43,10 @@
 
 	neotree
 
-	fill-column-indicator
+	;; fill-column-indicator
 
 	evil-cleverparens
+	highlight-parentheses
 	clojure-mode
 	clj-refactor
 	cider

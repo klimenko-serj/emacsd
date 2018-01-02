@@ -19,9 +19,14 @@
 (recentf-mode 1)
 (setq-default recent-save-file "~/.emacs.d/recentf")
 
+(setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
+(setq exec-path (append exec-path '("/usr/local/bin"
+				    "/Library/Frameworks/Firebird.framework/Resources/bin")))
+
 (load "~/.emacs.d/init-packages")
 
 (load-theme 'gruvbox-dark-soft t)
+(set-face-attribute 'default nil :font "Monaco-14")
 
 (require 'evil)
 (evil-mode 1)
@@ -32,6 +37,9 @@
 (setq evil-replace-state-cursor '("red" bar))
 (setq evil-operator-state-cursor '("red" hollow))
 (setq evil-move-cursor-back nil)
+
+(global-evil-visualstar-mode)
+(setq evil-visualstar/persistent t)
 
 (require 'helm)
 
@@ -65,18 +73,19 @@
                         (agenda . 5)
                         (registers . 5)))
 
-(require 'fill-column-indicator)
-(setq fci-rule-column 100)
-(defun on-off-fci-before-company(command)
-  (when (string= "show" command)
-    (turn-off-fci-mode))
-  (when (string= "hide" command)
-    (turn-on-fci-mode)))
-(advice-add 'company-call-frontends :before #'on-off-fci-before-company)
-(add-hook 'prog-mode-hook 'fci-mode)
-;; (add-hook 'elisp-mode 'fci-mode)
+;; (require 'fill-column-indicator)
+;; (setq fci-rule-column 100)
+;; (defun on-off-fci-before-company(command)
+;;   (when (string= "show" command)
+;;     (turn-off-fci-mode))
+;;   (when (string= "hide" command)
+;;     (turn-on-fci-mode)))
+;; (advice-add 'company-call-frontends :before #'on-off-fci-before-company)
+;; (add-hook 'prog-mode-hook 'fci-mode)
+;; ;; (add-hook 'elisp-mode 'fci-mode)
 ;; (add-hook 'clojure-mode 'fci-mode)
 
+(add-hook 'prog-mode-hook 'linum-mode)
 
 ;; keybindings
 
@@ -86,14 +95,17 @@
 (evil-leader/set-key
   "<SPC>" 'helm-M-x
   "b" 'helm-mini
-  "f" 'helm-find-files
+  "ff" 'helm-find-files
+  "fr" 'helm-recentf
+  "fs" 'save-buffer
   "y" 'helm-show-kill-ring
-  "r" 'helm-recentf
   "pf" 'helm-projectile
   "ps" 'helm-projectile-ag
   "P" 'helm-projectile-switch-project
   "j" 'helm-semantic-or-imenu
   "gs" 'magit-status
+  ";" 'avy-goto-char
+  "df" 'helm-etags-select
 
   "wo" 'delete-other-windows
   "wd" 'delete-window
@@ -127,11 +139,30 @@
 	    (define-key evil-normal-state-local-map (kbd "o") 'neotree-enter)))
 
 
+(defun cider-switch-ns-and-goto-repl ()
+  (interactive)
+  (call-interactively 'cider-repl-set-ns)
+  (cider-switch-to-repl-buffer))
+
+
 (defun lisp-editing-keybindings ()
+  (show-paren-mode)
+  (highlight-parentheses-mode)
+  (paredit-mode)
   (evil-cleverparens-mode))
 
+(defun clojure-editing-keybindings ()
+  (lisp-editing-keybindings)
+  (evil-leader/set-key
+    "ceb" 'cider-eval-buffer
+    "cef" 'cider-eval-defun-at-point
+    "ces" 'cider-eval-last-sexp
+    "rj"  'cider-jack-in
+    "rn"  'cider-switch-ns-and-goto-repl
+    ))
+
 (add-hook 'lisp-mode-hook #'lisp-editing-keybindings)
-(add-hook 'clojure-mode-hook #'lisp-editing-keybindings)
+(add-hook 'clojure-mode-hook #'clojure-editing-keybindings)
 (add-hook 'emacs-lisp-mode-hook #'lisp-editing-keybindings)
 
 (require 'which-key)
@@ -142,7 +173,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages (quote (evil))))
+ '(package-selected-packages (quote (avy evil))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
