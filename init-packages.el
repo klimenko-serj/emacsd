@@ -18,7 +18,10 @@
 
 
 (setq package-list
-      '(gruvbox-theme
+      '(
+	exec-path-from-shell
+	
+	gruvbox-theme
 	dashboard
 
 	evil
@@ -30,6 +33,7 @@
 	projectile
 
 	helm
+	helm-ag
 	helm-projectile
 
 	which-key
@@ -39,17 +43,22 @@
 
 	company
 
-	telephone-line
-
 	neotree
 
-	;; fill-column-indicator
+	;; yasnippet
 
+	;; lisp
 	evil-cleverparens
 	highlight-parentheses
+
+	;; clojre
 	clojure-mode
 	clj-refactor
 	cider
+
+	;; golang
+	go-mode
+	go-eldoc
 
 	))
 

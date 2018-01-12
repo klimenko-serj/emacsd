@@ -14,16 +14,18 @@
 ;; You may delete these explanatory comments.
 (package-initialize)
 
+
 (setq make-backup-files nil)
 
 (recentf-mode 1)
+(setq recentf-max-saved-items 1024)
 (setq-default recent-save-file "~/.emacs.d/recentf")
 
-(setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
-(setq exec-path (append exec-path '("/usr/local/bin"
-				    "/Library/Frameworks/Firebird.framework/Resources/bin")))
-
 (load "~/.emacs.d/init-packages")
+
+(when (memq window-system '(mac ns x))
+  (exec-path-from-shell-initialize)
+  (exec-path-from-shell-copy-env "GOPATH"))
 
 (load-theme 'gruvbox-dark-soft t)
 (set-face-attribute 'default nil :font "Monaco-14")
@@ -61,9 +63,6 @@
 (define-key company-active-map (kbd "C-j") 'company-select-next)
 (define-key company-active-map (kbd "C-k") 'company-select-previous)
 
-
-(require 'telephone-line-config)
-(telephone-line-evil-config)
 
 (require 'dashboard)
 (dashboard-setup-startup-hook)
@@ -154,9 +153,9 @@
 (defun clojure-editing-keybindings ()
   (lisp-editing-keybindings)
   (evil-leader/set-key
-    "ceb" 'cider-eval-buffer
-    "cef" 'cider-eval-defun-at-point
-    "ces" 'cider-eval-last-sexp
+    "eb" 'cider-eval-buffer
+    "ef" 'cider-eval-defun-at-point
+    "es" 'cider-eval-last-sexp
     "rj"  'cider-jack-in
     "rn"  'cider-switch-ns-and-goto-repl
     ))
@@ -165,8 +164,74 @@
 (add-hook 'clojure-mode-hook #'clojure-editing-keybindings)
 (add-hook 'emacs-lisp-mode-hook #'lisp-editing-keybindings)
 
+;; golang
+(setq go-path (concat (getenv "HOME") "/go/"))
+(add-to-list 'exec-path (concat go-path "bin/"))
+(add-to-list 'load-path (concat go-path "src/github.com/nsf/gocode/emacs-company"))
+(require 'company-go)
+
+(setq gofmt-command "goimports")
+
+
+(defun my-go-mode-hook ()
+  ;; with the gofmt-before-save hook above.
+  (add-hook 'before-save-hook 'gofmt-before-save)
+
+  ;; Customize compile command to run go build
+  (if (not (string-match "go" compile-command))
+      (set (make-local-variable 'compile-command)
+           "go build -v && go test -v && go vet"))
+
+  (evil-leader/set-key
+    "cc" 'compile
+    "cf" 'gofmt
+    "dd" 'godef-jump
+    "dD" 'godef-describe
+    )
+ (set (make-local-variable 'company-backends) '(company-go)))
+
+(add-hook 'go-mode-hook 'my-go-mode-hook)
+(add-hook 'go-mode-hook 'go-eldoc-setup)
+(add-hook 'go-mode-hook 'company-mode)
+
 (require 'which-key)
 (which-key-mode)
+
+
+(require 'whitespace)
+(setq whitespace-line-column 80) ;; limit line length
+(setq whitespace-style '(face lines-tail))
+(add-hook 'prog-mode-hook 'whitespace-mode)
+
+(setq-default mode-line-format
+	       (list ""
+		     '(:eval evil-mode-line-tag)
+		     ;; line and column
+		     (propertize "%l" 'face 'font-lock-type-face) ":"
+		     (propertize "%c" 'face 'font-lock-type-face) 
+		     " | "
+		     "%+"
+		     '(:eval (propertize "%b " 'face 'font-lock-builtin-face
+					 'help-echo (buffer-file-name)))
+
+
+		     ;; relative position, size of file
+		     "["
+		     (propertize "%p" 'face 'font-lock-constant-face) ;; % above top
+		     "/"
+		     (propertize "%I" 'face 'font-lock-constant-face) ;; size
+		     "]"
+
+		     '(vc-mode vc-mode)
+		     ;; the current major mode for the buffer.
+		     " | "
+		     '(:eval (propertize "%m" 'face 'font-lock-string-face
+					 'help-echo buffer-file-coding-system))
+		     " %-"
+
+		     ))
+
+(setq auto-revert-check-vc-info t)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
