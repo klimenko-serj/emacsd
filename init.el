@@ -20,6 +20,7 @@
 (recentf-mode 1)
 (setq recentf-max-saved-items 1024)
 (setq-default recent-save-file "~/.emacs.d/recentf")
+(save-place-mode 1)
 
 (load "~/.emacs.d/init-packages")
 
@@ -63,6 +64,22 @@
 (define-key company-active-map (kbd "C-j") 'company-select-next)
 (define-key company-active-map (kbd "C-k") 'company-select-previous)
 
+;; yasnippet
+(require 'yasnippet)
+(require 'clojure-snippets)
+(yas-global-mode 1)
+(add-to-list 'yas-snippet-dirs "~/.emacs.d/snippets")
+(yas-load-directory "~/.emacs.d/snippets")
+(setq yas-wrap-around-region t)
+;; evil evil-insert-snippet
+(add-hook 'yas-before-expand-snippet-hook
+		  #'(lambda()
+			  (when (evil-visual-state-p)
+				(let ((p (point))
+					  (m (mark)))
+				  (evil-insert-state)
+				  (goto-char p)
+				  (set-mark m)))))
 
 (require 'dashboard)
 (dashboard-setup-startup-hook)
@@ -71,18 +88,6 @@
                         (bookmarks . 5)
                         (agenda . 5)
                         (registers . 5)))
-
-;; (require 'fill-column-indicator)
-;; (setq fci-rule-column 100)
-;; (defun on-off-fci-before-company(command)
-;;   (when (string= "show" command)
-;;     (turn-off-fci-mode))
-;;   (when (string= "hide" command)
-;;     (turn-on-fci-mode)))
-;; (advice-add 'company-call-frontends :before #'on-off-fci-before-company)
-;; (add-hook 'prog-mode-hook 'fci-mode)
-;; ;; (add-hook 'elisp-mode 'fci-mode)
-;; (add-hook 'clojure-mode 'fci-mode)
 
 (add-hook 'prog-mode-hook 'linum-mode)
 
@@ -103,7 +108,7 @@
   "P" 'helm-projectile-switch-project
   "j" 'helm-semantic-or-imenu
   "gs" 'magit-status
-  ";" 'avy-goto-char
+  "s" 'avy-goto-char
   "df" 'helm-etags-select
 
   "wo" 'delete-other-windows
@@ -118,6 +123,7 @@
   "qq" 'save-buffers-kill-emacs
   "t" 'neotree-toggle
   "cl" 'comment-line
+  "is" 'yas-insert-snippet
   )
 
 
@@ -138,11 +144,16 @@
 	    (define-key evil-normal-state-local-map (kbd "o") 'neotree-enter)))
 
 
+;; clojure
 (defun cider-switch-ns-and-goto-repl ()
   (interactive)
   (call-interactively 'cider-repl-set-ns)
   (cider-switch-to-repl-buffer))
 
+(defun find-tag-without-ns (next-p)
+  (interactive "P")
+  (find-tag (first (last (split-string (symbol-name (symbol-at-point)) "/")))
+            next-p))
 
 (defun lisp-editing-keybindings ()
   (show-paren-mode)
@@ -152,17 +163,33 @@
 
 (defun clojure-editing-keybindings ()
   (lisp-editing-keybindings)
+  (cljr-add-keybindings-with-prefix "s-r")
   (evil-leader/set-key
     "eb" 'cider-eval-buffer
     "ef" 'cider-eval-defun-at-point
     "es" 'cider-eval-last-sexp
-    "rj"  'cider-jack-in
-    "rn"  'cider-switch-ns-and-goto-repl
+    "cj" 'cider-jack-in
+    "cn" 'cider-switch-ns-and-goto-repl
+    "dd" 'find-tag-without-ns
     ))
 
+(defun clj-tags-regen ()
+  (interactive)
+  (projectile-with-default-dir (projectile-project-root)
+    (start-process-shell-command
+     "clj-ctags" nil "ctags -Re -f \"TAGS\" src")))
+
+(defun clojure-install-env ()
+  (setq tags-revert-without-query 1)
+  (add-hook 'after-save-hook 'clj-tags-regen)
+
+  (clj-refactor-mode 1)
+  (clojure-editing-keybindings))
+
 (add-hook 'lisp-mode-hook #'lisp-editing-keybindings)
-(add-hook 'clojure-mode-hook #'clojure-editing-keybindings)
+(add-hook 'clojure-mode-hook #'clojure-install-env)
 (add-hook 'emacs-lisp-mode-hook #'lisp-editing-keybindings)
+
 
 ;; golang
 (setq go-path (concat (getenv "HOME") "/go/"))
@@ -200,15 +227,16 @@
 
 (require 'whitespace)
 (setq whitespace-line-column 80) ;; limit line length
-(setq whitespace-style '(face lines-tail))
+(setq whitespace-style '(face empty tabs lines-tail trailing))
 (add-hook 'prog-mode-hook 'whitespace-mode)
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 (setq-default mode-line-format
 	       (list ""
 		     '(:eval evil-mode-line-tag)
 		     ;; line and column
 		     (propertize "%l" 'face 'font-lock-type-face) ":"
-		     (propertize "%c" 'face 'font-lock-type-face) 
+		     (propertize "%c" 'face 'font-lock-type-face)
 		     " | "
 		     "%+"
 		     '(:eval (propertize "%b " 'face 'font-lock-builtin-face
@@ -244,4 +272,4 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(font-lock-keyword-face ((t (:foreground "salmon")))))

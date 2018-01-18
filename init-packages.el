@@ -20,7 +20,7 @@
 (setq package-list
       '(
 	exec-path-from-shell
-	
+
 	gruvbox-theme
 	dashboard
 
@@ -45,7 +45,8 @@
 
 	neotree
 
-	;; yasnippet
+	yasnippet
+	clojure-snippets
 
 	;; lisp
 	evil-cleverparens
@@ -72,4 +73,5 @@
 ; install the missing packages
 (dolist (package package-list)
   (unless (package-installed-p package)
+    (package-refresh-contents)
     (package-install package)))
