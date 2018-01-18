@@ -155,6 +155,12 @@
   (find-tag (first (last (split-string (symbol-name (symbol-at-point)) "/")))
             next-p))
 
+(defun clj-find ()
+  (interactive)
+  (condition-case nil
+      (cider-find-dwim (symbol-name (symbol-at-point)))
+    (error (call-interactively 'find-tag-without-ns))))
+
 (defun lisp-editing-keybindings ()
   (show-paren-mode)
   (highlight-parentheses-mode)
@@ -169,8 +175,9 @@
     "ef" 'cider-eval-defun-at-point
     "es" 'cider-eval-last-sexp
     "cj" 'cider-jack-in
+    "cc" 'cider-connect
     "cn" 'cider-switch-ns-and-goto-repl
-    "dd" 'find-tag-without-ns
+    "dd" 'clj-find
     ))
 
 (defun clj-tags-regen ()
