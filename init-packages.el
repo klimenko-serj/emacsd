@@ -55,6 +55,7 @@
 	;; clojre
 	clojure-mode
 	clj-refactor
+	cljr-helm
 	cider
 
 	;; golang

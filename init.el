@@ -30,6 +30,57 @@
 
 (load-theme 'gruvbox-dark-soft t)
 (set-face-attribute 'default nil :font "Monaco-14")
+;; (when (window-system)
+;;   (set-frame-font "Fira Code")
+;;   (set-face-attribute 'default (selected-frame) :height 140))
+;; (let ((alist '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
+;; 	       (35 . ".\\(?:###\\|##\\|_(\\|[#(?[_{]\\)")
+;; 	       (36 . ".\\(?:>\\)")
+;; 	       (37 . ".\\(?:\\(?:%%\\)\\|%\\)")
+;; 	       (38 . ".\\(?:\\(?:&&\\)\\|&\\)")
+;; 	       (42 . ".\\(?:\\(?:\\*\\*/\\)\\|\\(?:\\*[*/]\\)\\|[*/>]\\)")
+;; 	       (43 . ".\\(?:\\(?:\\+\\+\\)\\|[+>]\\)")
+;; 	       (45 . ".\\(?:\\(?:-[>-]\\|<<\\|>>\\)\\|[<>}~-]\\)")
+;; 	       (46 . ".\\(?:\\(?:\\.[.<]\\)\\|[.=-]\\)")
+;; 	       (47 . ".\\(?:\\(?:\\*\\*\\|//\\|==\\)\\|[*/=>]\\)")
+;; 	       (48 . ".\\(?:x[a-zA-Z]\\)")
+;; 	       (58 . ".\\(?:::\\|[:=]\\)")
+;; 	       (59 . ".\\(?:;;\\|;\\)")
+;; 	       (60 . ".\\(?:\\(?:!--\\)\\|\\(?:~~\\|->\\|\\$>\\|\\*>\\|\\+>\\|--\\|<[<=-]\\|=[<=>]\\||>\\)\\|[*$+~/<=>|-]\\)")
+;; 	       (61 . ".\\(?:\\(?:/=\\|:=\\|<<\\|=[=>]\\|>>\\)\\|[<=>~]\\)")
+;; 	       (62 . ".\\(?:\\(?:=>\\|>[=>-]\\)\\|[=>-]\\)")
+;; 	       (63 . ".\\(?:\\(\\?\\?\\)\\|[:=?]\\)")
+;; 	       (91 . ".\\(?:]\\)")
+;; 	       (92 . ".\\(?:\\(?:\\\\\\\\\\)\\|\\\\\\)")
+;; 	       (94 . ".\\(?:=\\)")
+;; 	       (119 . ".\\(?:ww\\)")
+;; 	       (123 . ".\\(?:-\\)")
+;; 	       (124 . ".\\(?:\\(?:|[=|]\\)\\|[=>|]\\)")
+;; 	       (126 . ".\\(?:~>\\|~~\\|[>=@~-]\\)")
+;; 	       )
+;; 	     ))
+;;   (dolist (char-regexp alist)
+;;     (set-char-table-range composition-function-table (car char-regexp)
+;; 			  `([,(cdr char-regexp) 0 font-shape-gstring]))))
+
+;; (add-hook 'helm-major-mode-hook
+;; 	  (lambda ()
+;; 	    (setq auto-composition-mode nil)))
+
+
+;; scroll one line at a time (less "jumpy" than defaults)
+(setq mouse-wheel-scroll-amount '(1 ((shift) . 1) ((control) . nil))) ;; one line at a time
+(setq mouse-wheel-progressive-speed nil) ;; don't accelerate scrolling
+(setq mouse-wheel-follow-mouse 't) ;; scroll window under mouse
+(setq scroll-step 1) ;; keyboard scroll one line at a time
+(setq scroll-conservatively 100000)
+(setq scroll-margin 3)
+(setq  redisplay-dont-pause t ;; don't pause display on input
+       ;; Always redraw immediately when scrolling,
+       ;; more responsive and doesn't hang!
+       fast-but-imprecise-scrolling nil
+       jit-lock-defer-time 0)
+
 
 (require 'evil)
 (evil-mode 1)
@@ -91,6 +142,20 @@
 
 (add-hook 'prog-mode-hook 'linum-mode)
 
+(defun kill-other-buffers ()
+    "Kill all other buffers."
+    (interactive)
+    (mapc 'kill-buffer
+          (delq (current-buffer)
+                (remove-if-not 'buffer-file-name (buffer-list)))))
+
+(defun close-all ()
+  "Close all buffers and windows"
+  (interactive)
+  (delete-other-windows)
+  (switch-to-buffer "*dashboard*")
+  (kill-other-buffers))
+
 ;; keybindings
 
 (global-set-key (kbd "M-x") 'helm-M-x)
@@ -106,6 +171,8 @@
   "pf" 'helm-projectile
   "ps" 'helm-projectile-ag
   "P" 'helm-projectile-switch-project
+  "pq" 'projectile-kill-buffers
+
   "j" 'helm-semantic-or-imenu
   "gs" 'magit-status
   "s" 'avy-goto-char
@@ -121,6 +188,11 @@
   "ws" 'evil-window-split
 
   "qq" 'save-buffers-kill-emacs
+  "qa" 'close-all
+  "qp" 'projectile-kill-buffers
+  "qb" 'kill-buffer
+  "qob" 'kill-other-buffers
+
   "t" 'neotree-toggle
   "cl" 'comment-line
   "is" 'yas-insert-snippet
@@ -171,6 +243,7 @@
   (lisp-editing-keybindings)
   (cljr-add-keybindings-with-prefix "s-r")
   (evil-leader/set-key
+    "r"  'cljr-helm
     "eb" 'cider-eval-buffer
     "ef" 'cider-eval-defun-at-point
     "es" 'cider-eval-last-sexp
@@ -233,8 +306,8 @@
 
 
 (require 'whitespace)
-(setq whitespace-line-column 80) ;; limit line length
-(setq whitespace-style '(face empty tabs lines-tail trailing))
+;; (setq whitespace-line-column 80) ;; limit line length
+(setq whitespace-style '(face empty tabs trailing)) ;; lines-tail for tailing lines
 (add-hook 'prog-mode-hook 'whitespace-mode)
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
