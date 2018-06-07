@@ -134,8 +134,8 @@
 
 (require 'dashboard)
 (dashboard-setup-startup-hook)
-(setq dashboard-items '((recents  . 5)
-                        (projects . 5)
+(setq dashboard-items '((projects . 5)
+			(recents  . 5)
                         (bookmarks . 5)
                         (agenda . 5)
                         (registers . 5)))
@@ -237,7 +237,11 @@
   (show-paren-mode)
   (highlight-parentheses-mode)
   (paredit-mode)
-  (evil-cleverparens-mode))
+  (evil-cleverparens-mode)
+
+  (local-set-key (kbd "M-(") 'paredit-wrap-round)
+  (local-set-key (kbd "M-[") 'paredit-wrap-square)
+  (local-set-key (kbd "M-{") 'paredit-wrap-curly))
 
 (defun clojure-editing-keybindings ()
   (lisp-editing-keybindings)
